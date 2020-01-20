@@ -20,7 +20,7 @@ class SQL(object):
     def disconnect_from_db(self):
         self.conn.close()
 
-    def new_client(self, name, username, password) -> bool:
+    def new_client(self, name, username, password):
         table_name = 'Client'
         try:
             cursor = self.conn.cursor()
