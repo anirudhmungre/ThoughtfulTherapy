@@ -32,7 +32,7 @@ class SQL(object):
                 [name, username, password]
             )
             
-            print(f'Added user {name}')
+            # print(f'Added user {name}')
         except (Exception, Error) as error :
             print (f'Error while inserting into table {table_name}', error)
             if(self.conn):
