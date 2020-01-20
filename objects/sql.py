@@ -58,7 +58,7 @@ class SQL(object):
 
             client = cursor.fetchall()
         except (Exception, Error) as error :
-            print (f'Error logging in user {error}')
+            print(f'Error logging in user {error}')
             if(self.conn):
                 cursor.close()
             return None
