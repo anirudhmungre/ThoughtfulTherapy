@@ -11,8 +11,8 @@ from json import dumps
 from random import randint
 
 # Global Items
-sql = None
-model = None
+sql = SQL(DB_CONFIG)
+model = Model(MODEL_CONFIG)
 
 app = Flask(__name__)
 CORS(app)
@@ -130,7 +130,4 @@ def client_messages():
         return {'messages': [], 'sessionIDs': [], 'success': False}, 200
 
 if __name__ == '__main__':
-    sql = SQL(DB_CONFIG)
-    model = Model(MODEL_CONFIG)
-
     app.run(debug=False)
