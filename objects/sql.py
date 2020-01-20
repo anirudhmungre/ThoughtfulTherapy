@@ -59,7 +59,7 @@ class SQL(object):
 
             client = cursor.fetchall()
         except (Exception, Error) as error :
-            print(f'Error logging in user {error}')
+            #print(f'Error logging in user {error}')
             if(self.conn):
                 cursor.close()
             return None
@@ -94,7 +94,7 @@ class SQL(object):
 
             session_id = cursor.fetchall()[-1]
 
-            print(f'Added session ID {session_id}')
+            #print(f'Added session ID {session_id}')
         except (Exception, Error) as error :
             #print (f'Error while starting a new session', error)
             if(self.conn):
