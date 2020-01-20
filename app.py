@@ -42,8 +42,8 @@ def login():
             return {'clientID': client[0], 'success': True}, 200
         else:
             return {'clientID': None, 'success': False}, 400
-    except Exception as error:
-        return {'clientID': error, 'success': False}, 400
+    except:
+        return {'clientID': None, 'success': False}, 400
 
 @app.route('/start', methods=['POST'])
 def start():
