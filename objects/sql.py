@@ -16,6 +16,7 @@ class SQL(object):
             return conn
         except (Exception, Error) as error :
             #print ('Error while connecting to PostgreSQL', error)
+            pass
     
     def disconnect_from_db(self):
         self.conn.close()
