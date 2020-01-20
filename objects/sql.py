@@ -15,7 +15,7 @@ class SQL(object):
                 )
             return conn
         except (Exception, Error) as error :
-            print ('Error while connecting to PostgreSQL', error)
+            #print ('Error while connecting to PostgreSQL', error)
     
     def disconnect_from_db(self):
         self.conn.close()
@@ -95,7 +95,7 @@ class SQL(object):
 
             print(f'Added session ID {session_id}')
         except (Exception, Error) as error :
-            print (f'Error while starting a new session', error)
+            #print (f'Error while starting a new session', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -136,10 +136,10 @@ class SQL(object):
                 """),
                 [interaction_id, message['session']]
             )
-            print(f"Added Interaction from {message['sender']} to {message['recipient']} at {message['time']}")
+            #print(f"Added Interaction from {message['sender']} to {message['recipient']} at {message['time']}")
 
         except (Exception, Error) as error :
-            print (f'Error while inserting into table.', error)
+            #print (f'Error while inserting into table.', error)
             if(self.conn):
                 cursor.close()
             return False
@@ -169,7 +169,7 @@ class SQL(object):
                 'time': time
                 } for (message, sender_id, recipient_id, time) in cursor.fetchall()]
         except (Exception, Error) as error :
-            print (f'Error logging in user', error)
+            #print (f'Error logging in user', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -199,7 +199,7 @@ class SQL(object):
                 'clientName': client_name
                 } for (client_id, client_name) in cursor.fetchall()]
         except (Exception, Error) as error :
-            print (f'Error logging in user', error)
+            #print (f'Error logging in user', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -244,7 +244,7 @@ class SQL(object):
             session_ids = [x[0] for x in cursor.fetchall()]
             
         except (Exception, Error) as error :
-            print (f'Error getting all messages', error)
+            #print (f'Error getting all messages', error)
             if(self.conn):
                 cursor.close()
             return None
