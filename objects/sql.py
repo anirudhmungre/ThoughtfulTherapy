@@ -34,7 +34,7 @@ class SQL(object):
             
             # print(f'Added user {name}')
         except (Exception, Error) as error :
-            print (f'Error while inserting into table {table_name}', error)
+            # print (f'Error while inserting into table {table_name}', error)
             if(self.conn):
                 cursor.close()
             return False
