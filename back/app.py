@@ -2,7 +2,7 @@ from secret.config import DB_CONFIG, MODEL_CONFIG, AI_ID
 from objects.sql import SQL
 from objects.model import Model
 from objects.message import Message
-from objects.responses import good_responses, bad_responses, start_conversation, start_conversation_responses
+from objects.responses import good_responses, bad_responses, start_conversation_responses
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -71,7 +71,7 @@ def send():
         completed0 = sql.message(vars(messageClient))
         
         messageToClient = ""
-        if data['message'] in start_conversation:
+        if any([start_convo in data['message'].lower() for start_convo in ['hi', 'hello', 'yo']]):
             messageToClient = start_conversation_responses[randint(0, 4)]
         elif (('thanks' in data['message'].lower()) or ('thank you' in data['message'].lower())):
             messageToClient = 'No problem! I\'m always here to help!'

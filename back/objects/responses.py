@@ -14,13 +14,13 @@ bad_responses = [
     'I am sure that tomorrow will be so much better for you! Today just sounds like plain bad luck :(',
 ]
 
-start_conversation = [
-    'Hi Melanie. Can we talk?',
-    'Hey Melanie! Do you have a couple minutes to talk?',
-    'Hi there! Do you want to hear about my day?',
-    'Hey there Mel! Are you busy?',
-    'Hi Melanie! Do you have a couple moments?'
-]
+# start_conversation = [
+#     'Hi Melanie. Can we talk?',
+#     'Hey Melanie! Do you have a couple minutes to talk?',
+#     'Hi there! Do you want to hear about my day?',
+#     'Hey there Mel! Are you busy?',
+#     'Hi Melanie! Do you have a couple moments?'
+# ]
 
 start_conversation_responses = [
     'Absolutely! I am here anytime :) Tell me about your day!',
