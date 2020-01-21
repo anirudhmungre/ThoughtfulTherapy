@@ -25,6 +25,10 @@ def root():
 def register():
     return render_template('register.html')
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/request/register', methods=['POST'])
 def request_register():
     data = request.get_json()
