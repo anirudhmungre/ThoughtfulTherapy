@@ -4,7 +4,7 @@ from objects.model import Model
 from objects.message import Message
 from objects.responses import good_responses, bad_responses, start_conversation_responses
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_cors import CORS
 from hashlib import sha256
 from json import dumps
@@ -19,10 +19,14 @@ CORS(app)
 
 @app.route('/')
 def root():
-    return 'Hello World!'
+    return render_template('index.html')
 
-@app.route('/register', methods=['POST'])
+@app.route('/register')
 def register():
+    return render_template('register.html')
+
+@app.route('/request/register', methods=['POST'])
+def request_register():
     data = request.get_json()
     try:
         completed = sql.new_client(data['name'], data['username'], data['password'])
@@ -33,8 +37,8 @@ def register():
     except:
         return {'success': False}, 400
 
-@app.route('/login', methods=['POST'])
-def login():
+@app.route('/request/login', methods=['POST'])
+def request_login():
     data = request.get_json()
     try:
         client = sql.login(data['username'], data['password'])
@@ -130,4 +134,4 @@ def client_messages():
         return {'messages': [], 'sessionIDs': [], 'success': False}, 200
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True, port=8000)

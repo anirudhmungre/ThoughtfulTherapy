@@ -1,4 +1,7 @@
 data/
+.vscode/
 __pycache__
 secret/
 start.sh
+node_modules/
+package-lock.json
