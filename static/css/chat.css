@@ -1,0 +1,19 @@
+html {
+    scroll-behavior: smooth;
+}
+
+.bot {
+    background: #eee;
+}
+
+.user {
+    color: white;
+    background: linear-gradient(to bottom, #00D0EA 0%, #0085D1 100%);
+    background-attachment: fixed;
+}
+
+.message {
+    border-radius: 15px;
+    padding: 1em;
+    padding-bottom: 0.2em;
+}

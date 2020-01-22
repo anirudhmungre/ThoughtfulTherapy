@@ -29,6 +29,11 @@ def register():
 def login():
     return render_template('login.html')
 
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
+
+
 @app.route('/request/register', methods=['POST'])
 def request_register():
     data = request.get_json()
@@ -79,7 +84,7 @@ def send():
         completed0 = sql.message(vars(messageClient))
         
         messageToClient = ""
-        if any([start_convo in data['message'].lower() for start_convo in ['hi', 'hello', 'yo']]):
+        if any([start_convo in data['message'].lower().split() for start_convo in ['hi', 'hello', 'yo', 'hey']]):
             messageToClient = start_conversation_responses[randint(0, 4)]
         elif (('thanks' in data['message'].lower()) or ('thank you' in data['message'].lower())):
             messageToClient = 'No problem! I\'m always here to help!'
@@ -107,7 +112,7 @@ def get_messages():
         if messages:
             return {'messages': messages, 'success': True}, 200
         else:
-            return {'messages': [], 'success': False}, 200
+            return {'messages': [], 'success': True}, 200
     except:
         return {'messages': [], 'success': False}, 200
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Melanie AI</title>
+
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-primary sticky-top">
+        <a class="navbar-brand" href='/'>Thoughtful Therapist</a>
+        <button id="logout" class="btn my-2 my-sm-0" type="submit">Logout</button>
+    </nav>
+
+    <div style="padding-bottom: 10vh; padding-top: 20px;">
+        <div id="message-box" class="container">
+        </div>
+    </div>
+
+    <nav class="navbar fixed-bottom navbar-light bg-light">
+        <div class="input-group mb-3">
+            <input id="message" type="text" class="form-control" placeholder="Message"
+                aria-label="Message" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button id="send" class="btn btn-success my-0" type="submit">Send</button>
+            </div>
+        </div>
+    </nav>
+
+    <script src="/static/js/chat.js"></script>
+</body>
+
+</html>
