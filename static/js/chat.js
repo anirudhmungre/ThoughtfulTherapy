@@ -10,7 +10,7 @@ const addMessage = (text, time, userMessage) => {
     blankSpace.className = 'col';
 
     let messageSlot = document.createElement('DIV');
-    messageSlot.className = 'col-5'
+    messageSlot.className = 'col-7'
 
     let message = document.createElement('P');
     message.textContent = text;
