@@ -26,8 +26,26 @@
             </nav>
             <h1 class="display-4">{{ name | title }}</h1>
             <p class="lead">
-                {{ name | title }} is a simple person with not much taste. Very bland opinions and an alright sense of
-                humor.
+                <div class="row">
+                    <ul class="list-group w-100 mb-2">
+                        <li class="list-group-item d-flex justify-content-between align-items-center
+                            {{ 'list-group-item-danger' if average_sentiment < 0.6 else
+                                'list-group-item-warning' if average_sentiment < 0.7
+                                else 'list-group-item-success'
+                            }}">
+                            Average Overall Happiness Level
+                            <span class="badge badge-primary badge-pill">
+                                {{ "%0.1f" | format(average_sentiment*100) }}%
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Number of Sessions
+                            <span class="badge badge-primary badge-pill">
+                                {{ session_sentiments | length }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
             </p>
             <hr class="my-4">
             <div class="row">
@@ -100,12 +118,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-
-    <script>
-        var messages = {{ messages | safe }};
-        var sessionIDs = {{ session_ids | safe }};
-    </script>
-    <script src="/static/js/clientProfile.js"></script>
 </body>
 
 </html>

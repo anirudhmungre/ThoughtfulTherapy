@@ -126,17 +126,16 @@ def clients(client_id):
             return render_template('clients.html', clients=clients)
         else:
             messages, session_sentiments, name = sql.all_messages(client_id)
-            return render_template('clientProfile.html', messages=messages, session_sentiments=session_sentiments, name=name)
+            average_sentiment = sum([s['averageSentiment'] for s in session_sentiments])/len(session_sentiments)
+            return render_template(
+                    'clientProfile.html', 
+                    messages=messages, 
+                    session_sentiments=session_sentiments, 
+                    name=name,
+                    average_sentiment=average_sentiment
+                )
     except:
         return "didnt work"
-
-# @app.route('/therapist/client/<client_id>/session/<session_id>', methods=['GET'])
-# def client_messages(id):
-#     try:
-#         messages, session_ids = sql.all_messages(id)
-#         return render_template('clientSessions.html', messages=messages, session_ids=session_ids)
-#     except:
-#         pass
 
 @app.template_filter('human_readable')
 def caps(timestamp):
