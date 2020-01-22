@@ -16,7 +16,6 @@ const addMessage = (text, time, userMessage) => {
     message.textContent = text;
     message.className = userMessage ? 'message user' : 'message bot';
 
-    // font-weight-light
     let messageTime = document.createElement('P');
     messageTime.textContent = datetime.toLocaleTimeString();
     messageTime.className = 'font-weight-light text-right';
