@@ -9,6 +9,7 @@ from flask_cors import CORS
 from hashlib import sha256
 from json import dumps
 from random import randint
+from datetime import datetime
 
 # Global Items
 sql = SQL(DB_CONFIG)
@@ -136,6 +137,10 @@ def clients(client_id):
 #         return render_template('clientSessions.html', messages=messages, session_ids=session_ids)
 #     except:
 #         pass
+
+@app.template_filter('human_readable')
+def caps(timestamp):
+    return datetime.fromtimestamp(int(timestamp/1000)).strftime('%Y-%m-%d %I:%M:%S %p')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

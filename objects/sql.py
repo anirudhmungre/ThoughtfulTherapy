@@ -241,7 +241,7 @@ class SQL(object):
 
             cursor.execute(
                 sql.SQL("""
-                    SELECT S.id, AVG(I.sentiment) AS averageSentiment
+                    SELECT S.id, AVG(I.sentiment) AS averageSentiment, MIN(I.time) AS start, MAX(I.time) AS end
                     FROM Session AS S
                     JOIN interactionsessionrelational AS ISR
                     ON ISR.sessionID=S.id
@@ -254,8 +254,10 @@ class SQL(object):
             )
             session_sentiments = [{
                 'sessionID': session_id,
-                'averageSentiment': avg_sentiment
-            } for (session_id, avg_sentiment) in cursor.fetchall()]
+                'averageSentiment': avg_sentiment,
+                'start': start,
+                'end': end
+            } for (session_id, avg_sentiment, start, end) in cursor.fetchall()]
 
             cursor.execute(
                 sql.SQL("""

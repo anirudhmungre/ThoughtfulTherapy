@@ -18,6 +18,12 @@
     <div class="container">
 
         <div class="jumbotron">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/therapist/client/all">All Clients</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ name | title }}</li>
+                </ol>
+            </nav>
             <h1 class="display-4">{{ name | title }}</h1>
             <p class="lead">
                 {{ name | title }} is a simple person with not much taste. Very bland opinions and an alright sense of
@@ -27,27 +33,54 @@
             <div class="row">
                 <div class="col-4">
                     <div class="list-group" id="list-tab" role="tablist">
-                        {% for session in session_sentiments %}
-                        <a id="list-{{session.sessionID}}"  class="list-group-item list-group-item-action
+                        {% for session in session_sentiments | sort(attribute='end') %}
+                        <a id="list-{{session.sessionID}}" class="list-group-item list-group-item-action
                             {{ 'list-group-item-danger' if session.averageSentiment < 0.6 else
                                 'list-group-item-warning' if session.averageSentiment < 0.7
                                 else 'list-group-item-success'
-                            }}" data-toggle="list"
-                            href="#{{ session.sessionID }}" role="tab" aria-controls="home">Session {{ loop.index }}</a>
+                            }}" data-toggle="list" href="#{{ session.sessionID }}" role="tab"
+                            aria-controls="home">Session {{ loop.index }}</a>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col-8">
                     <div class="tab-content" id="nav-tabContent">
                         {% for session in session_sentiments %}
-                        <div class="tab-pane fade show" id="{{ session.sessionID }}" role="tabpanel" aria-labelledby="list-{{ session.sessionID }}">
-                            {% for m in messages | selectattr('sessionID', 'equalto', session.sessionID) | sort(attribute='time') %}
+                        <div class="tab-pane fade show" id="{{ session.sessionID }}" role="tabpanel"
+                            aria-labelledby="list-{{ session.sessionID }}">
                             <div class="row">
-                            <div>
-                                <p class="message {{ 'bot-light' if m.senderID == 'b11f6ede-11c7-4705-92cb-d92785903f3d' else 'user'}}">
-                                    {{ m.message }}
-                                </p>
+                                <ul class="list-group w-100 mb-2">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Start Time
+                                        <span class="badge badge-primary badge-pill">
+                                            {{ session.start | human_readable }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Start Time
+                                        <span class="badge badge-primary badge-pill">
+                                            {{ session.end | human_readable }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Average Happiness Level
+                                        <span class="badge badge-primary badge-pill">
+                                            {{ "%0.1f"| format(session.averageSentiment*100) }}%
+                                        </span>
+                                    </li>
+                                </ul>
                             </div>
+                            <hr class="my-4">
+                            {% for m in messages | selectattr('sessionID', 'equalto', session.sessionID) | sort(attribute='time') %}
+                            <div class="row p-2">
+                                <div class="col-7 message {{ 'bot-light' if m.senderID == 'b11f6ede-11c7-4705-92cb-d92785903f3d' else 'user ml-auto'}}">
+                                    <p>
+                                        {{ m.message }}
+                                    </p>
+                                    <p class="font-weight-light text-right">
+                                        {{ m.time | human_readable }}
+                                    </p>
+                                </div>
                             </div>
                             {% endfor %}
                         </div>
