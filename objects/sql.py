@@ -188,17 +188,22 @@ class SQL(object):
             cursor = self.conn.cursor()
             cursor.execute(
                 sql.SQL("""
-                    SELECT id, name
-                    FROM Client
+                    SELECT c.id, c.name, AVG(i.sentiment) AS averageSentiment
+                    FROM client AS c
+                    LEFT JOIN interaction AS i
+                    ON i.senderID=c.id
                     WHERE name!=%s
+                    GROUP BY c.id
+                    ORDER BY c.name;
                 """),
                 ['Melanie']
             )
 
             clients = [ {
                 'clientID': client_id,
-                'clientName': client_name
-                } for (client_id, client_name) in cursor.fetchall()]
+                'clientName': client_name,
+                'averageSentiment': average_sentiment
+                } for (client_id, client_name, average_sentiment) in cursor.fetchall()]
         except (Exception, Error) as error :
             #print (f'Error logging in user', error)
             if(self.conn):
@@ -236,13 +241,31 @@ class SQL(object):
 
             cursor.execute(
                 sql.SQL("""
-                    SELECT id
-                    FROM Session
-                    WHERE clientID=%s
+                    SELECT S.id, AVG(I.sentiment) AS averageSentiment
+                    FROM Session AS S
+                    JOIN interactionsessionrelational AS ISR
+                    ON ISR.sessionID=S.id
+                    LEFT JOIN Interaction AS I
+                    ON ISR.interactionID=I.id
+                    WHERE I.senderID=%s
+                    GROUP BY S.id
                 """),
                 [client_id]
             )
-            session_ids = [x[0] for x in cursor.fetchall()]
+            session_sentiments = [{
+                'sessionID': session_id,
+                'averageSentiment': avg_sentiment
+            } for (session_id, avg_sentiment) in cursor.fetchall()]
+
+            cursor.execute(
+                sql.SQL("""
+                    SELECT name
+                    FROM Client
+                    WHERE id=%s
+                """),
+                [client_id]
+            )
+            name = cursor.fetchone()[0]
             
         except (Exception, Error) as error :
             #print (f'Error getting all messages', error)
@@ -253,6 +276,6 @@ class SQL(object):
             if(self.conn):
                 cursor.close()
         if len(messages):
-            return messages, session_ids
+            return messages, session_sentiments, name
         else:
             return None

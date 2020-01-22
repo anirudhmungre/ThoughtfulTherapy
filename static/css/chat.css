@@ -6,6 +6,10 @@ html {
     background: #eee;
 }
 
+.bot-light {
+    background: white;
+}
+
 .user {
     color: white;
     background: linear-gradient(to bottom, #00D0EA 0%, #0085D1 100%);

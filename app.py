@@ -33,7 +33,6 @@ def login():
 def chat():
     return render_template('chat.html')
 
-
 @app.route('/request/register', methods=['POST'])
 def request_register():
     data = request.get_json()
@@ -117,30 +116,26 @@ def get_messages():
         return {'messages': [], 'success': False}, 200
 
 
-
 # ALL FOR THERAPIST
-@app.route('/clients', methods=['GET'])
-def clients():
+@app.route('/therapist/client/<client_id>', methods=['GET'])
+def clients(client_id):
     try:
-        clients = sql.get_clients()
-        if clients:
-            return {'clients': clients, 'success': True}, 200
+        if client_id == 'all':
+            clients = sql.get_clients()
+            return render_template('clients.html', clients=clients)
         else:
-            return {'clients': None, 'success': False}, 400
+            messages, session_sentiments, name = sql.all_messages(client_id)
+            return render_template('clientProfile.html', messages=messages, session_sentiments=session_sentiments, name=name)
     except:
-        return {'clients': None, 'success': False}, 400
+        return "didnt work"
 
-@app.route('/client/messages', methods=['POST'])
-def client_messages():
-    data = request.get_json()
-    try:
-        messages, session_ids = sql.all_messages(data['clientID'])
-        if messages:
-            return {'messages': messages, 'sessionIDs': session_ids, 'success': True}, 200
-        else:
-            return {'messages': [], 'sessionIDs': [], 'success': False}, 200
-    except:
-        return {'messages': [], 'sessionIDs': [], 'success': False}, 200
+# @app.route('/therapist/client/<client_id>/session/<session_id>', methods=['GET'])
+# def client_messages(id):
+#     try:
+#         messages, session_ids = sql.all_messages(id)
+#         return render_template('clientSessions.html', messages=messages, session_ids=session_ids)
+#     except:
+#         pass
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

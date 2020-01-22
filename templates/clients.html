@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Client Login</title>
+
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-dark bg-primary sticky-top">
+            <a class="navbar-brand" href='/'>Thoughtful Therapist</a>
+        </nav>
+        <div class="card">
+            <h5 class="card-header">All Clients</h5>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for c in clients %}
+                    <!-- list-group-item-success -->
+                    <!-- list-group-item-danger -->
+                    <li class="list-group-item d-flex justify-content-between align-items-center
+                            {{ 'list-group-item-danger' if c.averageSentiment < 0.6 else
+                                'list-group-item-warning' if c.averageSentiment < 0.7
+                                else 'list-group-item-success'
+                            }}"
+                        onclick="window.location.href = '/therapist/client/{{c.clientID}}';">
+                        {{ c.clientName | title }}
+                        <span class="badge badge-primary badge-pill">Happiness {{ "%0.1f"| format(c.averageSentiment*100) }}%</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

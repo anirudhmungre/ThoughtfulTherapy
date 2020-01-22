@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ name | title }} Profile</title>
+
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-primary sticky-top">
+        <a class="navbar-brand" href='/'>Thoughtful Therapist</a>
+    </nav>
+    <div class="container">
+
+        <div class="jumbotron">
+            <h1 class="display-4">{{ name | title }}</h1>
+            <p class="lead">
+                {{ name | title }} is a simple person with not much taste. Very bland opinions and an alright sense of
+                humor.
+            </p>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-4">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        {% for session in session_sentiments %}
+                        <a id="list-{{session.sessionID}}"  class="list-group-item list-group-item-action
+                            {{ 'list-group-item-danger' if session.averageSentiment < 0.6 else
+                                'list-group-item-warning' if session.averageSentiment < 0.7
+                                else 'list-group-item-success'
+                            }}" data-toggle="list"
+                            href="#{{ session.sessionID }}" role="tab" aria-controls="home">Session {{ loop.index }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div class="tab-content" id="nav-tabContent">
+                        {% for session in session_sentiments %}
+                        <div class="tab-pane fade show" id="{{ session.sessionID }}" role="tabpanel" aria-labelledby="list-{{ session.sessionID }}">
+                            {% for m in messages | selectattr('sessionID', 'equalto', session.sessionID) | sort(attribute='time') %}
+                            <div class="row">
+                            <div>
+                                <p class="message {{ 'bot-light' if m.senderID == 'b11f6ede-11c7-4705-92cb-d92785903f3d' else 'user'}}">
+                                    {{ m.message }}
+                                </p>
+                            </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+        var messages = {{ messages | safe }};
+        var sessionIDs = {{ session_ids | safe }};
+    </script>
+    <script src="/static/js/clientProfile.js"></script>
+</body>
+
+</html>
