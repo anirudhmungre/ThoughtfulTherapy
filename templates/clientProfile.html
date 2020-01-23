@@ -5,29 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- The name of the user and their Profile -->
     <title>{{ name | title }} Profile</title>
 
+    <!-- Bootstrap and some custom CSS -->
     <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/chat.css">
 </head>
 
 <body>
+    <!-- Header at top of every page -->
     <nav class="navbar navbar-dark bg-primary sticky-top">
         <a class="navbar-brand" href='/'>Thoughtful Therapist</a>
     </nav>
     <div class="container">
-
+        <!-- Jumbotron for user info cause its big and cool -->
         <div class="jumbotron">
+            <!-- Breadcrumb allows therapist to go back to all clients -->
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/therapist/client/all">All Clients</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ name | title }}</li>
                 </ol>
             </nav>
+            <!-- Shows user and brief infor regarding them -->
             <h1 class="display-4">{{ name | title }}</h1>
             <p class="lead">
+                <!-- Shows brief overall info about client -->
                 <div class="row">
                     <ul class="list-group w-100 mb-2">
+                        <!-- The class jinja stuff happening here is to color the list item based on average sentiment -->
                         <li class="list-group-item d-flex justify-content-between align-items-center
                             {{ 'list-group-item-danger' if average_sentiment < 0.6 else
                                 'list-group-item-warning' if average_sentiment < 0.7
@@ -49,6 +56,7 @@
             </p>
             <hr class="my-4">
             <div class="row">
+                <!-- Shows sesssions that the user has gone through with the AI and colors based on average sentiment per session -->
                 <div class="col-4">
                     <div class="list-group" id="list-tab" role="tablist">
                         {% for session in session_sentiments | sort(attribute='end') %}
@@ -61,6 +69,7 @@
                         {% endfor %}
                     </div>
                 </div>
+                <!-- Shows the session nessages and info of that session once a session link is clicked -->
                 <div class="col-8">
                     <div class="tab-content" id="nav-tabContent">
                         {% for session in session_sentiments %}
@@ -89,6 +98,7 @@
                                 </ul>
                             </div>
                             <hr class="my-4">
+                            <!-- Shows all messages of the session -->
                             {% for m in messages | selectattr('sessionID', 'equalto', session.sessionID) | sort(attribute='time') %}
                             <div class="row p-2">
                                 <div class="col-7 message {{ 'bot-light' if m.senderID == 'b11f6ede-11c7-4705-92cb-d92785903f3d' else 'user ml-auto'}}">
@@ -109,6 +119,7 @@
         </div>
     </div>
 
+    <!-- Must use some bootstrap JS for some JS functionality on screen -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>

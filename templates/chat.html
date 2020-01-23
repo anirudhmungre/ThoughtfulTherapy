@@ -7,21 +7,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Melanie AI</title>
 
+    <!-- Using bootstrap and some custom css -->
     <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/chat.css">
 </head>
 
 <body>
+    <!-- Navbar on top of every screen, but this one has logout -->
     <nav class="navbar navbar-dark bg-primary sticky-top">
         <a class="navbar-brand" href='/'>Thoughtful Therapist</a>
         <button id="logout" class="btn my-2 my-sm-0" type="submit">Logout</button>
     </nav>
 
+    <!-- This is where all the messages go -->
     <div style="padding-bottom: 10vh; padding-top: 20px;">
         <div id="message-box" class="container">
         </div>
     </div>
 
+    <!-- The send message in the bottom -->
     <nav class="navbar fixed-bottom navbar-light bg-light">
         <div class="input-group mb-3">
             <input id="message" type="text" class="form-control" placeholder="Message"
@@ -32,6 +36,7 @@
         </div>
     </nav>
 
+    <!-- Custom JS module -->
     <script src="/static/js/chat.js"></script>
 </body>
 
