@@ -5,3 +5,4 @@ secret/
 start.sh
 node_modules/
 package-lock.json
+env/
