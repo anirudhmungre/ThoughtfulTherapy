@@ -1,10 +1,15 @@
 from psycopg2 import connect, sql, Error
 
+# This object controls and interfaces with the Cloud PostgreSQL DB
 class SQL(object):
     def __init__(self, DB_CONFIG):
+        # Connection to DB using predifined connection params
         self.conn = self.connect_to_db(DB_CONFIG)
 
     def connect_to_db(self, DB_CONFIG):
+        """
+        Using predefined connection params, establishes and stores connection to DB
+        """
         try:
             conn = connect(
                     user=DB_CONFIG['username'],
@@ -19,12 +24,18 @@ class SQL(object):
             pass
     
     def disconnect_from_db(self):
+        """
+        Closes connection to DB
+        """
         self.conn.close()
 
     def new_client(self, name, username, password):
-        table_name = 'Client'
+        """
+        Registers a new client and adds them to the DB
+        """
         try:
             cursor = self.conn.cursor()
+            # Add a new client into the DB with credentials specified
             cursor.execute(
                 sql.SQL("""
                     INSERT INTO Client(name, username, password)
@@ -33,9 +44,7 @@ class SQL(object):
                 [name, username, password]
             )
             
-            # print(f'Added user {name}')
         except (Exception, Error) as error :
-            # print (f'Error while inserting into table {table_name}', error)
             if(self.conn):
                 cursor.close()
             return False
@@ -46,8 +55,13 @@ class SQL(object):
         return True
 
     def login(self, username, password):
+        """
+        Checks if client login params match DB, if they do return client info
+        if they don't return None
+        """
         try:
             cursor = self.conn.cursor()
+            # Check if client exists with defined credentials
             cursor.execute(
                 sql.SQL("""
                     SELECT id, username
@@ -59,7 +73,6 @@ class SQL(object):
 
             client = cursor.fetchall()
         except (Exception, Error) as error :
-            #print(f'Error logging in user {error}')
             if(self.conn):
                 cursor.close()
             return None
@@ -72,9 +85,13 @@ class SQL(object):
             return None
 
     def new_session(self, client_id):
-        table_name = 'Session'
+        """
+        Create a new chat session with empty messages with the therapist AI
+        Each session message is tracked and separated from each other session
+        """
         session_id = None
         try:
+            # Create new sessionwith client ID (sessionID is generated in server side)
             cursor = self.conn.cursor()
             cursor.execute(
                 sql.SQL("""
@@ -84,6 +101,7 @@ class SQL(object):
                 [client_id]
             )
 
+            # Get the new sessionID that was generated
             cursor.execute(
                 sql.SQL("""
                     SELECT id FROM Session
@@ -93,10 +111,7 @@ class SQL(object):
             )
 
             session_id = cursor.fetchall()[-1]
-
-            #print(f'Added session ID {session_id}')
         except (Exception, Error) as error :
-            #print (f'Error while starting a new session', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -107,11 +122,13 @@ class SQL(object):
         return session_id
 
     def message(self, message):
-        table_name0 = 'Interaction'
-        table_name1 = 'Session'
-        table_name2 = 'InteractionSessionRelationship'
+        """
+        Adds a new message in each interaction.
+        The message object holds all required info including session info
+        """
         try:
             cursor = self.conn.cursor()
+            # Create new Interaction with message data
             cursor.execute(
                 sql.SQL("""
                     INSERT INTO Interaction(message, senderID, recipientID, time, sentiment)
@@ -120,6 +137,7 @@ class SQL(object):
                 [message['text'], message['sender'], message['recipient'], message['time'], message['sentiment']]
             )
 
+            # Get the created interactions interactionID
             cursor.execute(
                 sql.SQL("""
                     SELECT id
@@ -130,6 +148,7 @@ class SQL(object):
             )
             interaction_id = cursor.fetchone()[0]
 
+            # Create a relationship between the current session and the new interaction
             cursor.execute(
                 sql.SQL("""
                     INSERT INTO InteractionSessionRelational(interactionID, sessionID)
@@ -137,10 +156,7 @@ class SQL(object):
                 """),
                 [interaction_id, message['session']]
             )
-            #print(f"Added Interaction from {message['sender']} to {message['recipient']} at {message['time']}")
-
         except (Exception, Error) as error :
-            #print (f'Error while inserting into table.', error)
             if(self.conn):
                 cursor.close()
             return False
@@ -151,8 +167,12 @@ class SQL(object):
         return True
     
     def get_messages(self, session_id):
+        """
+        Retrieve all messages associated with a certain session
+        """
         try:
             cursor = self.conn.cursor()
+            # Get all messages per session ID
             cursor.execute(
                 sql.SQL("""
                     SELECT message, senderID, recipientID, time
@@ -163,6 +183,7 @@ class SQL(object):
                 [session_id]
             )
 
+            # Nicely format into list of dicts for json parsing in javascript return
             messages = [ {
                 'message': message,
                 'senderID': sender_id,
@@ -170,7 +191,6 @@ class SQL(object):
                 'time': time
                 } for (message, sender_id, recipient_id, time) in cursor.fetchall()]
         except (Exception, Error) as error :
-            #print (f'Error logging in user', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -184,28 +204,34 @@ class SQL(object):
 
     # EVERYTHING DOWN HERE FOR THERAPISTS
     def get_clients(self):
+        """
+        Returns all clients on the website
+        """
         try:
             cursor = self.conn.cursor()
+            # Retrieves all clients and the average sentiment 
+            # (or happiness of each client through their experience on the website)
+            # Exclued 'b11f6ede-11c7-4705-92cb-d92785903f3d' because that is the ID for the AI
             cursor.execute(
                 sql.SQL("""
                     SELECT c.id, c.name, AVG(i.sentiment) AS averageSentiment
                     FROM client AS c
                     LEFT JOIN interaction AS i
                     ON i.senderID=c.id
-                    WHERE name!=%s
+                    WHERE c.id!=%s
                     GROUP BY c.id
                     ORDER BY c.name;
                 """),
-                ['Melanie']
+                ['b11f6ede-11c7-4705-92cb-d92785903f3d']
             )
 
+            # Nicely format return for clients
             clients = [ {
                 'clientID': client_id,
                 'clientName': client_name,
                 'averageSentiment': average_sentiment
                 } for (client_id, client_name, average_sentiment) in cursor.fetchall()]
         except (Exception, Error) as error :
-            #print (f'Error logging in user', error)
             if(self.conn):
                 cursor.close()
             return None
@@ -218,8 +244,12 @@ class SQL(object):
             return None
     
     def all_messages(self, client_id):
+        """
+        Retrieves every message or interaction by the client from all sessions form all time
+        """
         try:
             cursor = self.conn.cursor()
+            # Get all sent or received messages by the client from every session
             cursor.execute(
                 sql.SQL("""
                     SELECT sessionId, message, senderID, recipientID, time, sentiment
@@ -230,6 +260,7 @@ class SQL(object):
                 [client_id, client_id]
             )
 
+            # format all messages for return
             messages = [ {
                 'sessionID': session_id,
                 'message': message,
@@ -239,6 +270,8 @@ class SQL(object):
                 'sentiment': sentiment
                 } for (session_id, message, sender_id, recipient_id, time, sentiment) in cursor.fetchall()]
 
+            # Get all sessions the client was a part of and the average sentiment per each of those sessions
+            # Also the start and end times of each of those sessions
             cursor.execute(
                 sql.SQL("""
                     SELECT S.id, AVG(I.sentiment) AS averageSentiment, MIN(I.time) AS start, MAX(I.time) AS end
@@ -252,6 +285,8 @@ class SQL(object):
                 """),
                 [client_id]
             )
+
+            # Nicely format for return
             session_sentiments = [{
                 'sessionID': session_id,
                 'averageSentiment': avg_sentiment,
@@ -259,6 +294,7 @@ class SQL(object):
                 'end': end
             } for (session_id, avg_sentiment, start, end) in cursor.fetchall()]
 
+            # Get the name of the client for front end knowledge
             cursor.execute(
                 sql.SQL("""
                     SELECT name
@@ -268,9 +304,7 @@ class SQL(object):
                 [client_id]
             )
             name = cursor.fetchone()[0]
-            
         except (Exception, Error) as error :
-            #print (f'Error getting all messages', error)
             if(self.conn):
                 cursor.close()
             return None

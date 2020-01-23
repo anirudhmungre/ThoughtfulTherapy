@@ -1,21 +1,26 @@
+/* We love smooth scrolling */
 html {
     scroll-behavior: smooth;
 }
 
+/* The bot will have duller color messages */
 .bot {
     background: #eee;
 }
 
+/* The bot messages on a different background might need to be brighter */
 .bot-light {
     background: white;
 }
 
+/* The user messages will have a nice gradient */
 .user {
     color: white;
     background: linear-gradient(to bottom, #00D0EA 0%, #0085D1 100%);
     background-attachment: fixed;
 }
 
+/* The message itself is a box with border radius */
 .message {
     border-radius: 15px;
     padding: 1em;
