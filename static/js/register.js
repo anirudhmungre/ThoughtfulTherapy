@@ -1,3 +1,4 @@
+localStorage.clear();
 document.getElementById('register').addEventListener('submit', (e) => {
     // On button click of Register button we must perform register action
     e.preventDefault();
