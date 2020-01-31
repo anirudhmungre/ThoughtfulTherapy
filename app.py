@@ -5,7 +5,6 @@ from objects.message import Message
 from objects.responses import good_responses, bad_responses, start_conversation_responses
 
 from flask import Flask, request, render_template
-from flask_cors import CORS
 from hashlib import sha256
 from json import dumps
 from random import randint
@@ -17,7 +16,6 @@ sql = SQL(DB_CONFIG)
 model = Model(MODEL_CONFIG)
 
 app = Flask(__name__)
-CORS(app)
 
 @app.route('/')
 def root():
