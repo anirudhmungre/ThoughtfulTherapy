@@ -3,6 +3,7 @@ data/
 __pycache__
 secret/
 start.sh
+start.ps1
 node_modules/
 package-lock.json
 env/
