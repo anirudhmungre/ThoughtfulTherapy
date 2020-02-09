@@ -17,12 +17,12 @@ def create_secrets():
     global DB_CONFIG, MODEL_ID, AI_ID
     if not path.exists('secret'):
         mkdir('secret')
-    google_service_account = loads(environ['GOOGLE_SERVICE_ACCOUNT'])
-    DB_CONFIG = loads(environ['DATABASE_CONFIG'])
+    google_service_account = loads(environ.get('GOOGLE_SERVICE_ACCOUNT'))
+    DB_CONFIG = loads(environ.get('DATABASE_CONFIG'))
     with open('./secret/therapistAI.json', 'w') as json_file:
         dump(google_service_account, json_file)
-    MODEL_ID = environ['MODEL_ID']
-    AI_ID = environ['AI_ID']
+    MODEL_ID = environ.get('MODEL_ID')
+    AI_ID = environ.get('AI_ID')
 
 
 try:
