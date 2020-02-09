@@ -17,11 +17,7 @@ def create_secrets():
     global DB_CONFIG, MODEL_ID, AI_ID
     if not path.exists('secret'):
         mkdir('secret')
-    print("THIS IS JSON")
-    print(environ.get('GOOGLE_SERVICE_ACCOUNT'))
-    print("THIS IS JSON")
     google_service_account = loads(environ.get('GOOGLE_SERVICE_ACCOUNT'))
-    print(google_service_account)
     DB_CONFIG = loads(environ.get('DATABASE_CONFIG'))
     with open('./secret/therapistAI.json', 'w') as json_file:
         dump(google_service_account, json_file)
