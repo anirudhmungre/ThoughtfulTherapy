@@ -1,4 +1,10 @@
-from secret.config import DB_CONFIG, MODEL_CONFIG, AI_ID
+from os import environ
+
+def create_secrets():
+    pass
+
+from secret.config import DB_CONFIG, MODEL_ID, AI_ID
+from google.oauth2 import service_account
 from objects.sql import SQL
 from objects.model import Model
 from objects.message import Message
@@ -12,8 +18,12 @@ from datetime import datetime
 
 # Global Items
 # Creates Interfaces for DB and Model
+CREDENTIALS = service_account.Credentials.from_service_account_file(
+    './secret/therapistAI.json',
+    scopes=["https://www.googleapis.com/auth/cloud-platform"],
+)
 sql = SQL(DB_CONFIG)
-model = Model(MODEL_CONFIG)
+model = Model(MODEL_ID, CREDENTIALS)
 
 app = Flask(__name__)
 
