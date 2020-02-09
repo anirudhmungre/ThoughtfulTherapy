@@ -18,8 +18,8 @@ def create_secrets():
     if not path.exists('secret'):
         mkdir('secret')
     print("HI WE DOIN IT")
-    print(loads(environ.get('GOOGLE_SERVICE_ACCOUNT')))
-    google_service_account = loads(environ.get('GOOGLE_SERVICE_ACCOUNT'))
+    google_service_account = loads(environ.get('GOOGLE_SERVICE_ACCOUNT', None))
+    print(google_service_account)
     DB_CONFIG = loads(environ.get('DATABASE_CONFIG'))
     with open('./secret/therapistAI.json', 'w') as json_file:
         dump(google_service_account, json_file)
