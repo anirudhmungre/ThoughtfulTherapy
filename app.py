@@ -1,20 +1,35 @@
-from os import environ
+from datetime import datetime
+from random import randint
+from hashlib import sha256
+from flask import Flask, request, render_template
+from google.oauth2 import service_account
+from objects.responses import good_responses, bad_responses, start_conversation_responses
+from objects.message import Message
+from objects.model import Model
+from objects.sql import SQL
+from os import environ, mkdir, path
+from json import dump, dumps, loads
+
+DB_CONFIG, MODEL_ID, AI_ID = None, None, None
+
 
 def create_secrets():
-    pass
+    global DB_CONFIG, MODEL_ID, AI_ID
+    if not path.exists('secret'):
+        mkdir('secret')
+    google_service_account = loads(environ['GOOGLE_SERVICE_ACCOUNT'])
+    DB_CONFIG = loads(environ['DATABASE_CONFIG'])
+    with open('./secret/therapistAI.json', 'w') as json_file:
+        dump(google_service_account, json_file)
+    MODEL_ID = environ['MODEL_ID']
+    AI_ID = environ['AI_ID']
 
-from secret.config import DB_CONFIG, MODEL_ID, AI_ID
-from google.oauth2 import service_account
-from objects.sql import SQL
-from objects.model import Model
-from objects.message import Message
-from objects.responses import good_responses, bad_responses, start_conversation_responses
 
-from flask import Flask, request, render_template
-from hashlib import sha256
-from json import dumps
-from random import randint
-from datetime import datetime
+try:
+    from secret.config import DB_CONFIG, MODEL_ID, AI_ID
+except ModuleNotFoundError:
+    create_secrets()
+
 
 # Global Items
 # Creates Interfaces for DB and Model
@@ -27,12 +42,14 @@ model = Model(MODEL_ID, CREDENTIALS)
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def root():
     """
     Renders the main page
     """
     return render_template('index.html')
+
 
 @app.route('/register')
 def register():
@@ -41,6 +58,7 @@ def register():
     """
     return render_template('register.html')
 
+
 @app.route('/login')
 def login():
     """
@@ -48,12 +66,14 @@ def login():
     """
     return render_template('login.html')
 
+
 @app.route('/chat')
 def chat():
     """
     Renders the chat page
     """
     return render_template('chat.html')
+
 
 @app.route('/request/register', methods=['POST'])
 def request_register():
@@ -63,13 +83,15 @@ def request_register():
     data = request.get_json()
     try:
         # Completed represents if the user was added with no issue
-        completed = sql.new_client(data['name'], data['username'], data['password'])
+        completed = sql.new_client(
+            data['name'], data['username'], data['password'])
         if completed:
             return {'success': True}, 200
         else:
             return {'success': False}, 400
     except:
         return {'success': False}, 400
+
 
 @app.route('/request/login', methods=['POST'])
 def request_login():
@@ -87,6 +109,7 @@ def request_login():
     except:
         return {'clientID': None, 'success': False}, 400
 
+
 @app.route('/start', methods=['POST'])
 def start():
     """
@@ -103,25 +126,27 @@ def start():
     except:
         return {'sessionID': None, 'success': False}, 400
 
+
 @app.route('/send', methods=['POST'])
 def send():
     """
     Request endpoint to send a message to the bot
     """
     data = request.get_json()
-    
+
     try:
         # Retrieves the sentiment of the sent message
         prediction = model.predict(data['message'])
         sentiment = None
         for annotation_payload in prediction:
-                sentiment = annotation_payload.text_sentiment.sentiment
+            sentiment = annotation_payload.text_sentiment.sentiment
 
         # Creates a new message object to the AI
-        messageClient = Message(data['message'], data['sessionID'], data['clientID'], AI_ID, sentiment)
+        messageClient = Message(
+            data['message'], data['sessionID'], data['clientID'], AI_ID, sentiment)
         # If successful it counts as completed
         completed0 = sql.message(vars(messageClient))
-        
+
         # Based on multiple factors (below) the bot will return a predefined appropriate response
         # Factor 1 -> Start conversation containing 'hi', 'hello', 'hey', or 'yo'
         # Factor 2 -> End conversation containing 'thanks' or 'thank you'
@@ -140,7 +165,8 @@ def send():
                 messageToClient = bad_responses[randint(0, 4)]
 
         # Creates a message from the AI object and sends to SQL to input in DB for session
-        messageAI = Message(messageToClient, data['sessionID'], AI_ID, data['clientID'], sentiment)
+        messageAI = Message(
+            messageToClient, data['sessionID'], AI_ID, data['clientID'], sentiment)
         completed1 = sql.message(vars(messageAI))
 
         # If both messages sent successfully then success is imminent
@@ -150,6 +176,7 @@ def send():
             return {'success': False}, 400
     except:
         return {'success': False}, 400
+
 
 @app.route('/messages', methods=['POST'])
 def get_messages():
@@ -180,17 +207,19 @@ def clients(client_id):
         else:
             messages, session_sentiments, name = sql.all_messages(client_id)
             # Calculate the average sentiment of the user over all sessions for profile info
-            average_sentiment = sum([s['averageSentiment'] for s in session_sentiments])/len(session_sentiments)
+            average_sentiment = sum(
+                [s['averageSentiment'] for s in session_sentiments])/len(session_sentiments)
             # Send to the front end all required info
             return render_template(
-                    'clientProfile.html', 
-                    messages=messages, 
-                    session_sentiments=session_sentiments, 
-                    name=name,
-                    average_sentiment=average_sentiment
-                )
+                'clientProfile.html',
+                messages=messages,
+                session_sentiments=session_sentiments,
+                name=name,
+                average_sentiment=average_sentiment
+            )
     except:
         return "didnt work"
+
 
 @app.template_filter('human_readable')
 def caps(timestamp):
@@ -198,6 +227,7 @@ def caps(timestamp):
     Custom filter to format the UNIX timestamp from DB into a readable format for the users
     """
     return datetime.fromtimestamp(int(timestamp/1000)).strftime('%Y-%m-%d %I:%M:%S %p')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
