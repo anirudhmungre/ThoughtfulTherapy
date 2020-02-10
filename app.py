@@ -3,6 +3,7 @@ from random import randint
 from hashlib import sha256
 from flask import Flask, request, render_template
 from google.oauth2 import service_account
+from twilio.rest import Client
 from objects.responses import good_responses, bad_responses, start_conversation_responses
 from objects.message import Message
 from objects.model import Model
@@ -10,15 +11,16 @@ from objects.sql import SQL
 from os import environ, mkdir, path
 from json import dump, dumps, loads
 
-DB_CONFIG, MODEL_ID, AI_ID = None, None, None
+DB_CONFIG, MODEL_ID, AI_ID, TWILIO_CONFIG = None, None, None, None
 
 
 def create_secrets():
-    global DB_CONFIG, MODEL_ID, AI_ID
+    global DB_CONFIG, MODEL_ID, AI_ID, TWILIO_CONFIG
     if not path.exists('secret'):
         mkdir('secret')
     google_service_account = loads(environ.get('GOOGLE_SERVICE_ACCOUNT'))
     DB_CONFIG = loads(environ.get('DATABASE_CONFIG'))
+    TWILIO_CONFIG = loads(environ.get('TWILIO_CONFIG'))
     with open('./secret/therapistAI.json', 'w') as json_file:
         dump(google_service_account, json_file)
     MODEL_ID = environ.get('MODEL_ID')
@@ -26,7 +28,7 @@ def create_secrets():
 
 
 try:
-    from secret.config import DB_CONFIG, MODEL_ID, AI_ID
+    from secret.config import DB_CONFIG, MODEL_ID, AI_ID, TWILIO_CONFIG
 except ModuleNotFoundError:
     create_secrets()
 
@@ -39,6 +41,7 @@ CREDENTIALS = service_account.Credentials.from_service_account_file(
 )
 sql = SQL(DB_CONFIG)
 model = Model(MODEL_ID, CREDENTIALS)
+sms = Client(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
 
 app = Flask(__name__)
 
@@ -86,6 +89,9 @@ def request_register():
         completed = sql.new_client(
             data['name'], data['username'], data['password'])
         if completed:
+            sms.messages.create(to="+16478921159", 
+                       from_="+16474907876", 
+                       body=f"New user profile created for {data['name']}! Username: {data['username']}")
             return {'success': True}, 200
         else:
             return {'success': False}, 400
